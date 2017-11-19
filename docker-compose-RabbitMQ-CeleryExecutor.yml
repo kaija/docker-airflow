@@ -1,0 +1,99 @@
+version: '2'
+services:
+    rabbitmq:
+        image: rabbitmq:3-management
+        environment:
+            RABBITMQ_DEFAULT_VHOST: airflow
+            RABBITMQ_DEFAULT_USER: airflow
+            RABBITMQ_DEFAULT_PASS: airflow
+        ports:
+          - "15672:15672"
+
+    postgres:
+        image: postgres:9.6
+        environment:
+            - POSTGRES_USER=airflow
+            - POSTGRES_PASSWORD=airflow
+            - POSTGRES_DB=airflow
+
+    webserver:
+        image: puckel/docker-airflow:rabbitmq
+        restart: always
+        depends_on:
+            - postgres
+            - rabbitmq
+        environment:
+            - LOAD_EX=n
+            - FERNET_KEY=46BKJoQYlPPOexq0OhDZnIlNepKFf87WFwLbfzqDDho=
+            - EXECUTOR=Celery
+            - USE_RABBITMQ=true
+            - RABBITMQ_USER=airflow
+            - RABBITMQ_PASSWORD=airflow
+            - RABBITMQ_VHOST=airflow
+            - RABBITMQ_HOST=rabbitmq
+            - RABBITMQ_PORT=5672
+            # - POSTGRES_USER=airflow
+            # - POSTGRES_PASSWORD=airflow
+            # - POSTGRES_DB=airflow
+        volumes:
+            - ./dags:/usr/local/airflow/dags
+        ports:
+            - "8080:8080"
+        command: webserver
+
+    flower:
+        image: puckel/docker-airflow:rabbitmq
+        restart: always
+        depends_on:
+            - rabbitmq
+        environment:
+            - EXECUTOR=Celery
+            - RABBITMQ_USER=airflow
+            - RABBITMQ_PASSWORD=airflow
+            - RABBITMQ_VHOST=airflow
+            - RABBITMQ_HOST=rabbitmq
+            - RABBITMQ_PORT=5672
+        ports:
+            - "5555:5555"
+        command: flower
+
+    scheduler:
+        image: puckel/docker-airflow:rabbitmq
+        restart: always
+        depends_on:
+            - webserver
+        volumes:
+            - ./dags:/usr/local/airflow/dags
+        environment:
+            - LOAD_EX=n
+            - FERNET_KEY=46BKJoQYlPPOexq0OhDZnIlNepKFf87WFwLbfzqDDho=
+            - EXECUTOR=Celery
+            - RABBITMQ_USER=airflow
+            - RABBITMQ_PASSWORD=airflow
+            - RABBITMQ_VHOST=airflow
+            - RABBITMQ_HOST=rabbitmq
+            - RABBITMQ_PORT=5672
+            # - POSTGRES_USER=airflow
+            # - POSTGRES_PASSWORD=airflow
+            # - POSTGRES_DB=airflow
+        command: scheduler
+
+    worker:
+        image: puckel/docker-airflow:rabbitmq
+        restart: always
+        depends_on:
+            - scheduler
+        volumes:
+            - ./dags:/usr/local/airflow/dags
+        environment:
+            - FERNET_KEY=46BKJoQYlPPOexq0OhDZnIlNepKFf87WFwLbfzqDDho=
+            - EXECUTOR=Celery
+            - RABBITMQ_USER=airflow
+            - RABBITMQ_PASSWORD=airflow
+            - RABBITMQ_VHOST=airflow
+            - RABBITMQ_HOST=rabbitmq
+            - RABBITMQ_PORT=5672
+            # - POSTGRES_USER=airflow
+            # - POSTGRES_PASSWORD=airflow
+            # - POSTGRES_DB=airflow
+        command: worker
