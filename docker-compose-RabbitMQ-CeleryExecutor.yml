@@ -26,7 +26,7 @@ services:
             - LOAD_EX=n
             - FERNET_KEY=46BKJoQYlPPOexq0OhDZnIlNepKFf87WFwLbfzqDDho=
             - EXECUTOR=Celery
-            - USE_RABBITMQ=true
+            - USE_RABBITMQ=yes
             - RABBITMQ_USER=airflow
             - RABBITMQ_PASSWORD=airflow
             - RABBITMQ_VHOST=airflow
@@ -48,6 +48,7 @@ services:
             - rabbitmq
         environment:
             - EXECUTOR=Celery
+            - USE_RABBITMQ=yes
             - RABBITMQ_USER=airflow
             - RABBITMQ_PASSWORD=airflow
             - RABBITMQ_VHOST=airflow
@@ -68,6 +69,7 @@ services:
             - LOAD_EX=n
             - FERNET_KEY=46BKJoQYlPPOexq0OhDZnIlNepKFf87WFwLbfzqDDho=
             - EXECUTOR=Celery
+            - USE_RABBITMQ=yes
             - RABBITMQ_USER=airflow
             - RABBITMQ_PASSWORD=airflow
             - RABBITMQ_VHOST=airflow
@@ -88,6 +90,7 @@ services:
         environment:
             - FERNET_KEY=46BKJoQYlPPOexq0OhDZnIlNepKFf87WFwLbfzqDDho=
             - EXECUTOR=Celery
+            - USE_RABBITMQ=yes
             - RABBITMQ_USER=airflow
             - RABBITMQ_PASSWORD=airflow
             - RABBITMQ_VHOST=airflow
